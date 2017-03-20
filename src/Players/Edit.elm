@@ -1,8 +1,9 @@
 module Players.Edit exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, value, href)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, value, href, type_, placeholder)
+import Html.Events exposing (onClick, on, targetValue)
+import Json.Decode as Json
 import Msgs exposing (Msg)
 import Models exposing (Player)
 import Routing exposing (playersPath)
@@ -32,12 +33,24 @@ form player =
 
 formLevel : Player -> Html Msg
 formLevel player =
-    div [ class "clearfix py1" ]
-        [ div [ class "col col-5" ] [ text "Level" ]
-        , div [ class "col col-7" ]
-            [ span [ class "h2 bold" ] [ text <| toString <| player.level ]
-            , btnLevelDecrease player
-            , btnLevelIncrease player
+    div []
+        [ div [ class "clearfix py1" ]
+            [ input
+                [ type_ "text"
+                , on "blur" (Json.map (Msgs.ChangeName player) targetValue)
+                , value player.name
+                , placeholder "Player's name"
+                ]
+                []
+            ]
+        , div
+            [ class "clearfix py1" ]
+            [ div [ class "col col-5" ] [ text "Level" ]
+            , div [ class "col col-7" ]
+                [ span [ class "h2 bold" ] [ text <| toString <| player.level ]
+                , btnLevelDecrease player
+                , btnLevelIncrease player
+                ]
             ]
         ]
 

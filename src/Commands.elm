@@ -41,20 +41,50 @@ savePlayerUrl playerId =
 
 savePlayerRequest : Player -> Http.Request Player
 savePlayerRequest player =
-    Http.request
-        { body = playerEncoder player |> Http.jsonBody
-        , expect = Http.expectJson playerDecoder
-        , headers = []
-        , method = "PATCH"
-        , timeout = Nothing
-        , url = savePlayerUrl player.id
-        , withCredentials = False
-        }
+    let
+        method =
+            if player.id == "" then
+                "POST"
+            else
+                "PATCH"
+    in
+        Http.request
+            { body = playerEncoder player |> Http.jsonBody
+            , expect = Http.expectJson playerDecoder
+            , headers = []
+            , method = method
+            , timeout = Nothing
+            , url = savePlayerUrl player.id
+            , withCredentials = False
+            }
 
 
 savePlayerCmd : Player -> Cmd Msg
-savePlayerCmd =
-    savePlayerRequest >> Http.send Msgs.OnPlayerSave
+savePlayerCmd player =
+    let
+        msg =
+            if player.id == "" then
+                Msgs.OnPlayerCreate
+            else
+                Msgs.OnPlayerSave
+    in
+        player |> savePlayerRequest |> Http.send msg
+
+
+deletePlayerCmd : PlayerId -> Cmd Msg
+deletePlayerCmd playerId =
+    Http.send
+        (Msgs.OnPlayerDelete playerId)
+        (Http.request
+            { body = Http.emptyBody
+            , expect = Http.expectString
+            , headers = []
+            , method = "DELETE"
+            , timeout = Nothing
+            , url = savePlayerUrl playerId
+            , withCredentials = False
+            }
+        )
 
 
 playerEncoder : Player -> Encode.Value

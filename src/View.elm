@@ -20,6 +20,9 @@ page model =
         Models.PlayersRoute ->
             Players.List.view model.players
 
+        Models.PlayerRoute "" ->
+            Players.Edit.view (Models.Player "" "" 0)
+
         Models.PlayerRoute id ->
             playerEditPage model id
 
